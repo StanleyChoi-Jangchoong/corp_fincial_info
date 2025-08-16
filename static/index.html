@@ -630,6 +630,64 @@
             margin-bottom: 20px;
         }
         
+        /* 재무구조 좌우 레이아웃 */
+        .balance-structure-layout {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .balance-left {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #28a745;
+        }
+        
+        .balance-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .balance-right-top {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #dc3545;
+        }
+        
+        .balance-right-bottom {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #007bff;
+        }
+        
+        .balance-section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .balance-section-title.assets {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .balance-section-title.liabilities {
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+        }
+        
+        .balance-section-title.equity {
+            background: linear-gradient(135deg, #007bff, #6610f2);
+        }
+        
         .component-card {
             background: #f8f9fa;
             border-radius: 12px;
@@ -967,7 +1025,7 @@
             <!-- 재무구조 탭 -->
             <div id="balanceTab" class="tab-content">
                 <div id="balanceEquation" class="balance-equation-container"></div>
-                <div id="balanceStructureAnalysis"></div>
+                <div id="balanceStructureAnalysis" class="balance-structure-layout"></div>
                 <div class="comparison-chart">
                     <h4>🏗️ 재무구조 시각화</h4>
                     <div class="chart-wrapper chart-small">
@@ -1863,17 +1921,15 @@
             
             equationContainer.innerHTML = equationHtml;
             
-            // 구성요소 분석 표시
-            let analysisHtml = '<div class="balance-components">';
+            // 구성요소 분석 표시 - 좌우 레이아웃
+            let analysisHtml = '<div class="balance-structure-layout">';
             
-            // 자산 구성
+            // 좌측: 자산 구성
+            analysisHtml += '<div class="balance-left">';
+            analysisHtml += '<div class="balance-section-title assets">🏦 자산 (Assets)</div>';
+            
             const assets = data.asset_composition;
             if (Object.keys(assets).length > 0) {
-                analysisHtml += `
-                    <div class="component-card assets">
-                        <h4>🏦 자산 구성</h4>
-                `;
-                
                 if (assets.current_assets) {
                     analysisHtml += `
                         <div class="component-item">
@@ -1906,18 +1962,18 @@
                         </div>
                     `;
                 }
-                
-                analysisHtml += '</div>';
             }
+            analysisHtml += '</div>';
             
-            // 부채 구성
+            // 우측: 부채와 자본
+            analysisHtml += '<div class="balance-right">';
+            
+            // 우측 상단: 부채 구성
+            analysisHtml += '<div class="balance-right-top">';
+            analysisHtml += '<div class="balance-section-title liabilities">📊 부채 (Liabilities)</div>';
+            
             const liabilities = data.liability_composition;
             if (Object.keys(liabilities).length > 0) {
-                analysisHtml += `
-                    <div class="component-card liabilities">
-                        <h4>📊 부채 구성</h4>
-                `;
-                
                 if (liabilities.current_liabilities) {
                     analysisHtml += `
                         <div class="component-item">
@@ -1950,18 +2006,15 @@
                         </div>
                     `;
                 }
-                
-                analysisHtml += '</div>';
             }
+            analysisHtml += '</div>';
             
-            // 자본 구성
+            // 우측 하단: 자본 구성
+            analysisHtml += '<div class="balance-right-bottom">';
+            analysisHtml += '<div class="balance-section-title equity">💎 자본 (Equity)</div>';
+            
             const equity = data.equity_composition;
             if (Object.keys(equity).length > 0) {
-                analysisHtml += `
-                    <div class="component-card equity">
-                        <h4>💎 자본 구성</h4>
-                `;
-                
                 if (equity.capital_stock) {
                     analysisHtml += `
                         <div class="component-item">
@@ -1986,9 +2039,9 @@
                         </div>
                     `;
                 }
-                
-                analysisHtml += '</div>';
             }
+            analysisHtml += '</div>';
+            analysisHtml += '</div>';
             
             analysisHtml += '</div>';
             analysisContainer.innerHTML = analysisHtml;
