@@ -1207,7 +1207,7 @@ def get_detailed_financial_analysis(corp_code):
         
         # 재무제표별 계정 분류
         bs_accounts = [item for item in complete_data['list'] if item.get('sj_div') == 'BS']
-        is_accounts = [item for item in complete_data['list'] if item.get('sj_div') == 'IS']
+        is_accounts = [item for item in complete_data['list'] if item.get('sj_div') in ['IS', 'CIS']]  # IS 또는 CIS
         cf_accounts = [item for item in complete_data['list'] if item.get('sj_div') == 'CF']
         
         print(f"재무상태표(BS): {len(bs_accounts)}개")
@@ -1256,8 +1256,8 @@ def get_detailed_financial_analysis(corp_code):
                 elif '자본총계' in account_name:
                     financial_metrics['total_equity'] = amount
             
-            # 손익계산서 (IS)
-            elif item.get('sj_div') == 'IS':
+            # 손익계산서 (IS 또는 CIS)
+            elif item.get('sj_div') in ['IS', 'CIS']:
                 # 영업이익 매칭 개선
                 if any(keyword in account_name for keyword in ['영업이익', '영업손익', '영업손실']):
                     if '영업이익(손실)' not in account_name and '영업손실' not in account_name:
@@ -1279,7 +1279,7 @@ def get_detailed_financial_analysis(corp_code):
             
             # 현금흐름표 (CF)
             elif item.get('sj_div') == 'CF':
-                if any(keyword in account_name for keyword in ['영업활동으로 인한 현금흐름', '영업활동 현금흐름', '영업활동 현금흐름(손실)']):
+                if any(keyword in account_name for keyword in ['영업활동으로 인한 현금흐름', '영업활동 현금흐름', '영업활동 현금흐름(손실)', '영업활동현금흐름']):
                     financial_metrics['operating_cash_flow'] = amount
         
         # EBITDA 계산
