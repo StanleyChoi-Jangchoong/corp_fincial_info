@@ -1237,6 +1237,13 @@ def get_detailed_financial_analysis(corp_code):
         sj_div_values = set(item.get('sj_div') for item in complete_data['list'])
         print(f"발견된 sj_div 값들: {sj_div_values}")
         
+        print("=== CIS 계정들 확인 ===")
+        cis_accounts = [item for item in complete_data['list'] if item.get('sj_div') == 'CIS']
+        print(f"CIS 계정 수: {len(cis_accounts)}")
+        for i, item in enumerate(cis_accounts[:10]):  # 처음 10개만 출력
+            account_name = item.get('account_nm', '').strip()
+            print(f"{i+1}. {account_name}")
+        
         # 재무제표에서 필요한 계정 추출
         for item in complete_data['list']:
             account_name = item.get('account_nm', '').strip()
