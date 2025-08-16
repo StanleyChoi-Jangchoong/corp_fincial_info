@@ -137,6 +137,10 @@ def load_corp_data(conn):
 # 데이터베이스 연결 생성
 db_conn = init_database()
 
+# 애플리케이션 시작 시 데이터 로드
+print("애플리케이션 초기화 중...")
+load_corp_data(db_conn)
+
 @app.route('/')
 def index():
     """메인 페이지"""
@@ -1092,9 +1096,9 @@ def get_ai_summary(corp_code):
         return jsonify({'error': f'AI 요약 생성 중 오류가 발생했습니다: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    # 데이터 로드를 별도 스레드에서 실행
-    load_thread = threading.Thread(target=load_corp_data, args=(db_conn,))
-    load_thread.start()
+    # 데이터를 먼저 로드 (동기적으로)
+    print("데이터 로딩을 시작합니다...")
+    load_corp_data(db_conn)
     
     print("🚀 오픈다트 재무 데이터 분석 서비스가 http://localhost:8080 에서 실행 중입니다.")
     print("📊 메인 페이지: http://localhost:8080")
