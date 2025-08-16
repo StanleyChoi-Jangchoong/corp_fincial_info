@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>오픈다트 재무 데이터 분석 서비스</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <style>
         * {
             margin: 0;
@@ -1124,6 +1125,9 @@
     </div>
 
     <script>
+        // Chart.js 플러그인 등록
+        Chart.register(ChartDataLabels);
+        
         // 전역 변수
         let currentChart = null;
         let currentCorpCode = null;
@@ -2094,6 +2098,32 @@
                         },
                         legend: {
                             display: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    const total = balanceEq.total_assets / 1000000;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.dataset.label}: ${value.toLocaleString()}백만원 (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#fff',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value, context) {
+                                const total = balanceEq.total_assets / 1000000;
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${value.toLocaleString()}\n(${percentage}%)`;
+                            },
+                            anchor: 'center',
+                            align: 'center',
+                            offset: 0
                         }
                     },
                     scales: {
