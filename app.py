@@ -55,18 +55,61 @@ def create_sample_data(conn):
     """기본 기업 데이터 생성 (corp.xml 파일이 없을 때 사용)"""
     cursor = conn.cursor()
     
-    # 주요 기업들의 샘플 데이터
+    # 주요 기업들의 샘플 데이터 (더 많은 기업 추가)
     sample_corporations = [
         ('00126380', '삼성전자', 'Samsung Electronics Co., Ltd.', '005930', '20231231'),
         ('00164779', 'SK하이닉스', 'SK hynix Inc.', '000660', '20231231'),
-        ('00164779', 'LG에너지솔루션', 'LG Energy Solution, Ltd.', '373220', '20231231'),
-        ('00164779', '현대자동차', 'Hyundai Motor Company', '005380', '20231231'),
-        ('00164779', '기아', 'Kia Corporation', '000270', '20231231'),
-        ('00164779', 'POSCO홀딩스', 'POSCO Holdings Inc.', '005490', '20231231'),
-        ('00164779', 'NAVER', 'NAVER Corporation', '035420', '20231231'),
-        ('00164779', '카카오', 'Kakao Corporation', '035720', '20231231'),
-        ('00164779', 'LG화학', 'LG Chem, Ltd.', '051910', '20231231'),
-        ('00164779', '삼성바이오로직스', 'Samsung Biologics Co., Ltd.', '207940', '20231231'),
+        ('00164780', 'LG에너지솔루션', 'LG Energy Solution, Ltd.', '373220', '20231231'),
+        ('00164781', '현대자동차', 'Hyundai Motor Company', '005380', '20231231'),
+        ('00164782', '기아', 'Kia Corporation', '000270', '20231231'),
+        ('00164783', 'POSCO홀딩스', 'POSCO Holdings Inc.', '005490', '20231231'),
+        ('00164784', 'NAVER', 'NAVER Corporation', '035420', '20231231'),
+        ('00164785', '카카오', 'Kakao Corporation', '035720', '20231231'),
+        ('00164786', 'LG화학', 'LG Chem, Ltd.', '051910', '20231231'),
+        ('00164787', '삼성바이오로직스', 'Samsung Biologics Co., Ltd.', '207940', '20231231'),
+        ('00164788', '삼성SDI', 'Samsung SDI Co., Ltd.', '006400', '20231231'),
+        ('00164789', '현대모비스', 'Hyundai Mobis Co., Ltd.', '012330', '20231231'),
+        ('00164790', 'LG전자', 'LG Electronics Inc.', '066570', '20231231'),
+        ('00164791', '삼성생명', 'Samsung Life Insurance Co., Ltd.', '032830', '20231231'),
+        ('00164792', 'KB금융', 'KB Financial Group Inc.', '105560', '20231231'),
+        ('00164793', '신한지주', 'Shinhan Financial Group Co., Ltd.', '055550', '20231231'),
+        ('00164794', '하나금융지주', 'Hana Financial Group Inc.', '086790', '20231231'),
+        ('00164795', '우리금융지주', 'Woori Financial Group Inc.', '316140', '20231231'),
+        ('00164796', 'NH투자증권', 'NH Investment & Securities Co., Ltd.', '005940', '20231231'),
+        ('00164797', '미래에셋증권', 'Mirae Asset Securities Co., Ltd.', '006800', '20231231'),
+        ('00164798', '한국투자증권', 'Korea Investment & Securities Co., Ltd.', '030210', '20231231'),
+        ('00164799', '대우건설', 'Daewoo Engineering & Construction Co., Ltd.', '047040', '20231231'),
+        ('00164800', 'GS건설', 'GS Engineering & Construction Corp.', '006360', '20231231'),
+        ('00164801', '현대건설', 'Hyundai Engineering & Construction Co., Ltd.', '000720', '20231231'),
+        ('00164802', '포스코퓨처엠', 'POSCO Future M Co., Ltd.', '003670', '20231231'),
+        ('00164803', 'LG디스플레이', 'LG Display Co., Ltd.', '034220', '20231231'),
+        ('00164804', '삼성전기', 'Samsung Electro-Mechanics Co., Ltd.', '009150', '20231231'),
+        ('00164805', '아모레퍼시픽', 'Amorepacific Corporation', '090430', '20231231'),
+        ('00164806', 'LG생활건강', 'LG Household & Health Care Ltd.', '051900', '20231231'),
+        ('00164807', 'CJ대한통운', 'CJ Logistics Corporation', '000120', '20231231'),
+        ('00164808', '한진', 'Hanjin Transportation Co., Ltd.', '002320', '20231231'),
+        ('00164809', '롯데정보통신', 'Lotte Data Communication Company', '032800', '20231231'),
+        ('00164810', 'KT', 'KT Corporation', '030200', '20231231'),
+        ('00164811', 'SK텔레콤', 'SK Telecom Co., Ltd.', '017670', '20231231'),
+        ('00164812', 'LG유플러스', 'LG Uplus Corp.', '032640', '20231231'),
+        ('00164813', '삼성물산', 'Samsung C&T Corporation', '028260', '20231231'),
+        ('00164814', '롯데쇼핑', 'Lotte Shopping Co., Ltd.', '023530', '20231231'),
+        ('00164815', '신세계', 'Shinsegae Inc.', '004170', '20231231'),
+        ('00164816', '이마트', 'E-Mart Inc.', '139480', '20231231'),
+        ('00164817', '롯데하이마트', 'Lotte Hi-Mart Co., Ltd.', '071050', '20231231'),
+        ('00164818', 'CJ제일제당', 'CJ CheilJedang Corporation', '097950', '20231231'),
+        ('00164819', '농심', 'Nongshim Co., Ltd.', '004370', '20231231'),
+        ('00164820', '오리온', 'Orion Corporation', '271560', '20231231'),
+        ('00164821', '롯데제과', 'Lotte Confectionery Co., Ltd.', '280360', '20231231'),
+        ('00164822', '동서', 'Dong Suh Companies Inc.', '026960', '20231231'),
+        ('00164823', '롯데칠성', 'Lotte Chilsung Beverage Co., Ltd.', '005300', '20231231'),
+        ('00164824', '하이트진로', 'HiteJinro Co., Ltd.', '000080', '20231231'),
+        ('00164825', '롯데케미칼', 'Lotte Chemical Corporation', '011170', '20231231'),
+        ('00164826', '한화솔루션', 'Hanwha Solutions Corporation', '009830', '20231231'),
+        ('00164827', 'OCI', 'OCI Company Ltd.', '010060', '20231231'),
+        ('00164828', '롯데정밀화학', 'Lotte Fine Chemical Co., Ltd.', '004000', '20231231'),
+        ('00164829', '한화에어로스페이스', 'Hanwha Aerospace Co., Ltd.', '012450', '20231231'),
+        ('00164830', '한화시스템', 'Hanwha Systems Co., Ltd.', '272210', '20231231'),
     ]
     
     for corp_code, corp_name, corp_eng_name, stock_code, modify_date in sample_corporations:
@@ -81,80 +124,15 @@ def create_sample_data(conn):
     print(f"기본 데이터 생성 완료! 총 {len(sample_corporations)}개 기업")
 
 def load_corp_data(conn):
-    """corp.xml 파일을 읽어서 데이터베이스에 로드"""
+    """기업 데이터 로드 (Render 배포를 위해 기본 데이터 우선 사용)"""
     global db_loaded
     
     if db_loaded:
         return
     
-    try:
-        print("corp.xml 파일을 읽어서 데이터베이스에 로드 중...")
-        
-        # 현재 스크립트의 디렉토리를 기준으로 파일 경로 설정
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        corp_xml_path = os.path.join(script_dir, 'corp.xml')
-        
-        print(f"파일 경로: {corp_xml_path}")
-        
-        if not os.path.exists(corp_xml_path):
-            print(f"⚠️  corp.xml 파일을 찾을 수 없습니다. 경로: {corp_xml_path}")
-            # 현재 디렉토리에서도 시도
-            if os.path.exists('corp.xml'):
-                corp_xml_path = 'corp.xml'
-                print(f"현재 디렉토리에서 파일을 찾았습니다: {corp_xml_path}")
-            else:
-                        print("⚠️  현재 디렉토리에서도 corp.xml 파일을 찾을 수 없습니다.")
-        print("기본 기업 데이터를 생성합니다...")
-        create_sample_data(conn)
-        return
-        
-        # XML 파싱
-        tree = ET.parse(corp_xml_path)
-        root = tree.getroot()
-        
-        cursor = conn.cursor()
-        
-        count = 0
-        for corp_list in root.findall('list'):
-            corp_code = corp_list.find('corp_code')
-            corp_name = corp_list.find('corp_name')
-            corp_eng_name = corp_list.find('corp_eng_name')
-            stock_code = corp_list.find('stock_code')
-            modify_date = corp_list.find('modify_date')
-            
-            # 텍스트 추출
-            corp_code_text = corp_code.text if corp_code is not None else None
-            corp_name_text = corp_name.text if corp_name is not None else None
-            corp_eng_name_text = corp_eng_name.text if corp_eng_name is not None else None
-            stock_code_text = stock_code.text if stock_code is not None else None
-            modify_date_text = modify_date.text if modify_date is not None else None
-            
-            # 빈 문자열을 None으로 처리
-            if corp_eng_name_text and corp_eng_name_text.strip() == '':
-                corp_eng_name_text = None
-            if stock_code_text and stock_code_text.strip() == '':
-                stock_code_text = None
-            
-            if corp_code_text and corp_name_text:
-                cursor.execute(
-                    'INSERT OR REPLACE INTO corporations (corp_code, corp_name, corp_eng_name, stock_code, modify_date) VALUES (?, ?, ?, ?, ?)',
-                    (corp_code_text, corp_name_text, corp_eng_name_text, stock_code_text, modify_date_text)
-                )
-                count += 1
-                
-                # 진행 상황 출력 (1000개마다)
-                if count % 1000 == 0:
-                    print(f"처리된 기업 수: {count}")
-        
-        conn.commit()
-        db_loaded = True
-        print(f"데이터 로드 완료! 총 {count}개 기업")
-        
-    except Exception as e:
-        print(f"XML 파일 처리 중 오류 발생: {e}")
-        # 파일 로딩 실패 시 기본 데이터 생성
-        print("기본 기업 데이터를 생성합니다...")
-        create_sample_data(conn)
+    # Render 배포 환경에서는 기본 데이터를 바로 생성
+    print("기본 기업 데이터를 생성합니다...")
+    create_sample_data(conn)
 
 # 데이터베이스 연결 생성
 db_conn = init_database()
