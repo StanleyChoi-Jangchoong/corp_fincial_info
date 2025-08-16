@@ -1092,6 +1092,7 @@
             <div id="overviewTab" class="tab-content active">
                 <div id="financialSummary" class="financial-summary"></div>
                 <div class="chart-container">
+                    <div id="financialChartValues" class="chart-values-display"></div>
                     <div class="chart-wrapper">
                         <canvas id="financialChart"></canvas>
                     </div>
@@ -1625,6 +1626,20 @@
                 chartData.datasets[0].data.push(Math.round(accounts.net_income / 1000000));
             }
             
+            // 차트 위에 금액 표시
+            const chartValuesContainer = document.getElementById('financialChartValues');
+            let valuesHtml = '';
+            chartData.labels.forEach((label, index) => {
+                const value = chartData.datasets[0].data[index];
+                valuesHtml += `
+                    <div class="chart-value-item">
+                        <div class="chart-value-label">${label}</div>
+                        <div class="chart-value-amount">${value.toLocaleString()}백만원</div>
+                    </div>
+                `;
+            });
+            chartValuesContainer.innerHTML = valuesHtml;
+            
             // 차트 생성
             currentChart = new Chart(ctx, {
                 type: 'bar',
@@ -1642,11 +1657,32 @@
                         }
                     },
                     scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
                                 text: '금액 (백만원)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            display: true,
+                            color: '#000',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 4,
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            },
+                            formatter: function(value) {
+                                return value.toLocaleString() + '백만원';
                             }
                         }
                     }
