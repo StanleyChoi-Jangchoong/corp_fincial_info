@@ -2521,8 +2521,17 @@
                     `;
                 }
                 
-                // 총자산수익률 (ROA)
-                if (detailedRatios.roa !== undefined) {
+                // 총자산수익률 (ROA) - 기존 분석 데이터에서 가져오기
+                if (currentAnalysisData && currentAnalysisData.profitability_analysis && currentAnalysisData.profitability_analysis.roa !== undefined) {
+                    const roaClass = currentAnalysisData.profitability_analysis.roa > 5 ? 'positive' : 
+                                    currentAnalysisData.profitability_analysis.roa > 2 ? 'neutral' : 'negative';
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">총자산수익률 (ROA)</span>
+                            <span class="metric-value ${roaClass}">${currentAnalysisData.profitability_analysis.roa}%</span>
+                        </div>
+                    `;
+                } else if (detailedRatios.roa !== undefined) {
                     const roaClass = detailedRatios.roa > 5 ? 'positive' : 
                                     detailedRatios.roa > 2 ? 'neutral' : 'negative';
                     html += `
