@@ -61,12 +61,24 @@ def load_corp_data(conn):
     try:
         print("corp.xml 파일을 읽어서 데이터베이스에 로드 중...")
         
-        if not os.path.exists('corp.xml'):
-            print("⚠️  corp.xml 파일을 찾을 수 없습니다.")
-            return
+        # 현재 스크립트의 디렉토리를 기준으로 파일 경로 설정
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        corp_xml_path = os.path.join(script_dir, 'corp.xml')
+        
+        print(f"파일 경로: {corp_xml_path}")
+        
+        if not os.path.exists(corp_xml_path):
+            print(f"⚠️  corp.xml 파일을 찾을 수 없습니다. 경로: {corp_xml_path}")
+            # 현재 디렉토리에서도 시도
+            if os.path.exists('corp.xml'):
+                corp_xml_path = 'corp.xml'
+                print(f"현재 디렉토리에서 파일을 찾았습니다: {corp_xml_path}")
+            else:
+                print("⚠️  현재 디렉토리에서도 corp.xml 파일을 찾을 수 없습니다.")
+                return
         
         # XML 파싱
-        tree = ET.parse('corp.xml')
+        tree = ET.parse(corp_xml_path)
         root = tree.getroot()
         
         cursor = conn.cursor()
