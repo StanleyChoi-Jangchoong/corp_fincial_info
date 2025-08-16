@@ -2488,10 +2488,16 @@
             const chartData = {
                 labels: ['전기', '당기'],
                 datasets: [{
-                    label: '매출액 (백만원)',
-                    data: [previousRevenue, currentRevenue],
-                    backgroundColor: ['rgba(118, 75, 162, 0.8)', 'rgba(102, 126, 234, 0.8)'],
-                    borderColor: ['rgba(118, 75, 162, 1)', 'rgba(102, 126, 234, 1)'],
+                    label: '전기 매출액',
+                    data: [previousRevenue, 0],
+                    backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                    borderColor: 'rgba(118, 75, 162, 1)',
+                    borderWidth: 2
+                }, {
+                    label: '당기 매출액',
+                    data: [0, currentRevenue],
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
                     borderWidth: 2
                 }]
             };
@@ -2530,7 +2536,11 @@
                             }
                         },
                         legend: {
-                            display: false
+                            display: true,
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
                         }
                     },
                     scales: {
