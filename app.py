@@ -1297,9 +1297,13 @@ def get_detailed_financial_analysis(corp_code):
                 ebitda += financial_metrics['depreciation']
             if financial_metrics['amortization'] is not None:
                 ebitda += financial_metrics['amortization']
+            print(f"EBITDA 계산: {ebitda}")
+        else:
+            print("영업이익이 없어서 EBITDA 계산 불가")
         
         # 영업활동현금흐름 직접 설정 (디버깅 로그에서 확인된 값)
         financial_metrics['operating_cash_flow'] = 345467000000
+        print(f"영업활동현금흐름 설정: {financial_metrics['operating_cash_flow']}")
         
         # 기존 분석 API에서 영업이익 가져오기 (EBITDA 계산용)
         try:
@@ -1311,6 +1315,7 @@ def get_detailed_financial_analysis(corp_code):
                         current_amount = item.get('thstrm_amount')
                         if current_amount and current_amount.replace(',', '').replace('-', '').isdigit():
                             financial_metrics['operating_profit'] = int(current_amount.replace(',', ''))
+                            print(f"영업이익 설정: {financial_metrics['operating_profit']}")
                             break
         except Exception as e:
             print(f"기존 분석 API에서 영업이익 가져오기 실패: {e}")
