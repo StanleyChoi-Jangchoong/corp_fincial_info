@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>오픈다트 재무 데이터 분석 서비스</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <style>
         * {
             margin: 0;
@@ -731,6 +730,45 @@
             color: #6c757d;
         }
         
+        /* 차트 값 표시 스타일 */
+        .chart-values-display {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+        }
+        
+        .chart-value-item {
+            text-align: center;
+            padding: 8px 15px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 120px;
+        }
+        
+        .chart-value-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .chart-value-amount {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .chart-value-amount.previous {
+            color: #764ba2;
+        }
+        
+        .chart-value-amount.current {
+            color: #667eea;
+        }
+        
         .component-card {
             background: #f8f9fa;
             border-radius: 12px;
@@ -1082,6 +1120,7 @@
                 <div id="revenueAnalysis"></div>
                 <div class="comparison-chart">
                     <h4>📊 매출 추이 분석</h4>
+                    <div id="revenueChartValues" class="chart-values-display"></div>
                     <div class="chart-wrapper chart-small">
                         <canvas id="revenueChart"></canvas>
                     </div>
@@ -1168,8 +1207,7 @@
     </div>
 
     <script>
-        // Chart.js 플러그인 등록
-        Chart.register(ChartDataLabels);
+
         
         // 전역 변수
         let currentChart = null;
@@ -2458,6 +2496,19 @@
                 }]
             };
             
+            // 차트 위에 금액 표시
+            const chartValuesContainer = document.getElementById('revenueChartValues');
+            chartValuesContainer.innerHTML = `
+                <div class="chart-value-item">
+                    <div class="chart-value-label">전기 매출액</div>
+                    <div class="chart-value-amount previous">${previousRevenue.toLocaleString()}백만원</div>
+                </div>
+                <div class="chart-value-item">
+                    <div class="chart-value-label">당기 매출액</div>
+                    <div class="chart-value-amount current">${currentRevenue.toLocaleString()}백만원</div>
+                </div>
+            `;
+            
             analysisCharts.revenue = new Chart(ctx, {
                 type: 'bar',
                 data: chartData,
@@ -2477,19 +2528,12 @@
                                 }
                             }
                         },
-                        datalabels: {
+                        legend: {
                             display: true,
-                            color: '#fff',
-                            font: {
-                                weight: 'bold',
-                                size: 11
-                            },
-                            formatter: function(value, context) {
-                                return value.toLocaleString();
-                            },
-                            anchor: 'end',
-                            align: 'top',
-                            offset: 4
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
                         }
                     },
                     scales: {
