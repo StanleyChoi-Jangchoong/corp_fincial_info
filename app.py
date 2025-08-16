@@ -1201,6 +1201,26 @@ def get_detailed_financial_analysis(corp_code):
             'amortization': None,  # 무형자산상각비
         }
         
+        # 디버깅: 실제 계정명들 확인
+        print(f"=== 상세 재무 분석 디버깅 ===")
+        print(f"총 {len(complete_data['list'])}개 계정 발견")
+        
+        # 재무제표별 계정 분류
+        bs_accounts = [item for item in complete_data['list'] if item.get('sj_div') == 'BS']
+        is_accounts = [item for item in complete_data['list'] if item.get('sj_div') == 'IS']
+        cf_accounts = [item for item in complete_data['list'] if item.get('sj_div') == 'CF']
+        
+        print(f"재무상태표(BS): {len(bs_accounts)}개")
+        print(f"손익계산서(IS): {len(is_accounts)}개")
+        print(f"현금흐름표(CF): {len(cf_accounts)}개")
+        
+        # 손익계산서 계정명들 출력 (영업이익, 이자비용, 감가상각비 관련)
+        print("=== 손익계산서 주요 계정들 ===")
+        for item in is_accounts:
+            account_name = item.get('account_nm', '').strip()
+            if any(keyword in account_name for keyword in ['영업', '이자', '감가상각', '무형자산']):
+                print(f"- {account_name}: {item.get('thstrm_amount')}")
+        
         # 재무제표에서 필요한 계정 추출
         for item in complete_data['list']:
             account_name = item.get('account_nm', '').strip()
@@ -1222,20 +1242,28 @@ def get_detailed_financial_analysis(corp_code):
             
             # 손익계산서 (IS)
             elif item.get('sj_div') == 'IS':
-                if '영업이익' in account_name and '영업이익(손실)' not in account_name:
-                    financial_metrics['operating_profit'] = amount
-                elif '영업이익(손실)' in account_name:
-                    financial_metrics['operating_profit'] = amount
-                elif '이자비용' in account_name or '이자비용(수익)' in account_name:
+                # 영업이익 매칭 개선
+                if any(keyword in account_name for keyword in ['영업이익', '영업손익', '영업손실']):
+                    if '영업이익(손실)' not in account_name and '영업손실' not in account_name:
+                        financial_metrics['operating_profit'] = amount
+                    elif '영업이익(손실)' in account_name:
+                        financial_metrics['operating_profit'] = amount
+                
+                # 이자비용 매칭 개선
+                if any(keyword in account_name for keyword in ['이자비용', '이자비용(수익)', '이자비용(손실)', '이자비용(수익)']):
                     financial_metrics['interest_expense'] = amount
-                elif '감가상각비' in account_name:
+                
+                # 감가상각비 매칭 개선
+                if any(keyword in account_name for keyword in ['감가상각비', '감가상각', '감가상각비용']):
                     financial_metrics['depreciation'] = amount
-                elif '무형자산상각비' in account_name or '무형자산상각' in account_name:
+                
+                # 무형자산상각비 매칭 개선
+                if any(keyword in account_name for keyword in ['무형자산상각비', '무형자산상각', '무형자산상각비용']):
                     financial_metrics['amortization'] = amount
             
             # 현금흐름표 (CF)
             elif item.get('sj_div') == 'CF':
-                if '영업활동으로 인한 현금흐름' in account_name or '영업활동 현금흐름' in account_name:
+                if any(keyword in account_name for keyword in ['영업활동으로 인한 현금흐름', '영업활동 현금흐름', '영업활동 현금흐름(손실)']):
                     financial_metrics['operating_cash_flow'] = amount
         
         # EBITDA 계산
