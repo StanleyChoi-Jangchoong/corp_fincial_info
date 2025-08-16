@@ -1,0 +1,39 @@
+spring:
+  # 데이터베이스 설정 (H2 인메모리 데이터베이스)
+  datasource:
+    url: jdbc:h2:mem:opendart
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  # JPA 설정
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # H2 콘솔 활성화 (개발용)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # 정적 리소스 설정
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+# 서버 설정
+server:
+  port: 8080
+
+# 로깅 설정
+logging:
+  level:
+    com.opendart.financial: INFO
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
