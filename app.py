@@ -1301,9 +1301,14 @@ def get_detailed_financial_analysis(corp_code):
         else:
             print("영업이익이 없어서 EBITDA 계산 불가")
         
+        print(f"EBITDA 최종값: {ebitda}")
+        
         # 영업활동현금흐름 직접 설정 (디버깅 로그에서 확인된 값)
         financial_metrics['operating_cash_flow'] = 345467000000
         print(f"영업활동현금흐름 설정: {financial_metrics['operating_cash_flow']}")
+        
+        # 최종 financial_metrics 확인
+        print(f"최종 financial_metrics: {financial_metrics}")
         
         # 기존 분석 API에서 영업이익 가져오기 (EBITDA 계산용)
         try:
@@ -1319,6 +1324,9 @@ def get_detailed_financial_analysis(corp_code):
                             break
         except Exception as e:
             print(f"기존 분석 API에서 영업이익 가져오기 실패: {e}")
+        
+        # 최종 financial_metrics 재확인
+        print(f"영업이익 설정 후 financial_metrics: {financial_metrics}")
         
         # 재무비율 계산
         ratios = {}
