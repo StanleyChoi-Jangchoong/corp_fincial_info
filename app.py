@@ -1289,7 +1289,7 @@ def get_detailed_financial_analysis(corp_code):
                 if any(keyword in account_name for keyword in ['영업활동으로 인한 현금흐름', '영업활동 현금흐름', '영업활동 현금흐름(손실)', '영업활동현금흐름']):
                     financial_metrics['operating_cash_flow'] = amount
         
-        # EBITDA 계산
+        # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
         if financial_metrics['operating_profit'] is not None:
             ebitda = financial_metrics['operating_profit']
@@ -1297,6 +1297,16 @@ def get_detailed_financial_analysis(corp_code):
                 ebitda += financial_metrics['depreciation']
             if financial_metrics['amortization'] is not None:
                 ebitda += financial_metrics['amortization']
+        
+        # 영업활동현금흐름이 없으면 현금흐름표에서 찾기
+        if financial_metrics['operating_cash_flow'] is None:
+            for item in cf_accounts:
+                account_name = item.get('account_nm', '').strip()
+                if '영업활동현금흐름' in account_name:
+                    current_amount = item.get('thstrm_amount')
+                    if current_amount and current_amount.replace(',', '').replace('-', '').isdigit():
+                        financial_metrics['operating_cash_flow'] = int(current_amount.replace(',', ''))
+                        break
         
         # 재무비율 계산
         ratios = {}
