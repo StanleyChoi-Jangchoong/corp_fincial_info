@@ -1308,6 +1308,20 @@ def get_detailed_financial_analysis(corp_code):
                         financial_metrics['operating_cash_flow'] = int(current_amount.replace(',', ''))
                         break
         
+        # 기존 분석 API에서 영업이익 가져오기 (EBITDA 계산용)
+        try:
+            analysis_data = get_financial_statements(corp_code, bsns_year, reprt_code)
+            if analysis_data and 'list' in analysis_data:
+                for item in analysis_data['list']:
+                    account_name = item.get('account_nm', '').strip()
+                    if '영업이익' in account_name and '영업이익(손실)' not in account_name:
+                        current_amount = item.get('thstrm_amount')
+                        if current_amount and current_amount.replace(',', '').replace('-', '').isdigit():
+                            financial_metrics['operating_profit'] = int(current_amount.replace(',', ''))
+                            break
+        except Exception as e:
+            print(f"기존 분석 API에서 영업이익 가져오기 실패: {e}")
+        
         # 재무비율 계산
         ratios = {}
         
