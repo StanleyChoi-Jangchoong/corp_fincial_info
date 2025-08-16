@@ -2178,6 +2178,22 @@
                 `;
             }
             
+            if (revenue.previous_revenue) {
+                const revenueChange = revenue.current_revenue - revenue.previous_revenue;
+                const changeClass = revenueChange > 0 ? 'positive' : 
+                                   revenueChange < 0 ? 'negative' : 'neutral';
+                const changeText = revenueChange > 0 ? 
+                    `+${formatCurrency(revenueChange)}` : 
+                    formatCurrency(revenueChange);
+                
+                html += `
+                    <div class="metric-row">
+                        <span class="metric-label">매출 증감액</span>
+                        <span class="metric-value ${changeClass}">${changeText}</span>
+                    </div>
+                `;
+            }
+            
             if (revenue.revenue_growth_rate !== null) {
                 const growthClass = revenue.revenue_growth_rate > 0 ? 'positive' : 
                                    revenue.revenue_growth_rate < 0 ? 'negative' : 'neutral';
@@ -2383,14 +2399,16 @@
             
             if (!revenue.current_revenue) return;
             
+            const previousRevenue = revenue.previous_revenue ? Math.round(revenue.previous_revenue / 1000000) : 0;
+            const currentRevenue = Math.round(revenue.current_revenue / 1000000);
+            const revenueChange = currentRevenue - previousRevenue;
+            const revenueChangePercent = previousRevenue > 0 ? ((revenueChange / previousRevenue) * 100).toFixed(1) : 0;
+            
             const chartData = {
                 labels: ['전기', '당기'],
                 datasets: [{
                     label: '매출액 (백만원)',
-                    data: [
-                        revenue.previous_revenue ? Math.round(revenue.previous_revenue / 1000000) : 0,
-                        Math.round(revenue.current_revenue / 1000000)
-                    ],
+                    data: [previousRevenue, currentRevenue],
                     backgroundColor: ['rgba(118, 75, 162, 0.8)', 'rgba(102, 126, 234, 0.8)'],
                     borderColor: ['rgba(118, 75, 162, 1)', 'rgba(102, 126, 234, 1)'],
                     borderWidth: 2
@@ -2407,6 +2425,39 @@
                         title: {
                             display: true,
                             text: '매출액 비교'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    return `매출액: ${value.toLocaleString()}백만원`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#fff',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value, context) {
+                                if (context.dataIndex === 1 && previousRevenue > 0) {
+                                    // 당기 막대에 증감액 표시
+                                    const changeText = revenueChange >= 0 ? 
+                                        `+${revenueChange.toLocaleString()}` : 
+                                        `${revenueChange.toLocaleString()}`;
+                                    const changeClass = revenueChange >= 0 ? 'positive' : 'negative';
+                                    return [
+                                        `${value.toLocaleString()}`,
+                                        `${changeText} (${revenueChangePercent}%)`
+                                    ];
+                                }
+                                return value.toLocaleString();
+                            },
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 4
                         }
                     },
                     scales: {
