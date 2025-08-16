@@ -689,6 +689,48 @@
             background: linear-gradient(135deg, #007bff, #6610f2);
         }
         
+        /* 매출 증감 정보 스타일 */
+        .revenue-change-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .revenue-change-item {
+            display: inline-block;
+            margin: 0 20px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .revenue-change-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .revenue-change-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .revenue-change-value.positive {
+            color: #28a745;
+        }
+        
+        .revenue-change-value.negative {
+            color: #dc3545;
+        }
+        
+        .revenue-change-value.neutral {
+            color: #6c757d;
+        }
+        
         .component-card {
             background: #f8f9fa;
             border-radius: 12px;
@@ -1043,6 +1085,7 @@
                     <div class="chart-wrapper chart-small">
                         <canvas id="revenueChart"></canvas>
                     </div>
+                    <div id="revenueChangeInfo" class="revenue-change-info"></div>
                 </div>
             </div>
             
@@ -2439,20 +2482,9 @@
                             color: '#fff',
                             font: {
                                 weight: 'bold',
-                                size: 12
+                                size: 11
                             },
                             formatter: function(value, context) {
-                                if (context.dataIndex === 1 && previousRevenue > 0) {
-                                    // 당기 막대에 증감액 표시
-                                    const changeText = revenueChange >= 0 ? 
-                                        `+${revenueChange.toLocaleString()}` : 
-                                        `${revenueChange.toLocaleString()}`;
-                                    const changeClass = revenueChange >= 0 ? 'positive' : 'negative';
-                                    return [
-                                        `${value.toLocaleString()}`,
-                                        `${changeText} (${revenueChangePercent}%)`
-                                    ];
-                                }
                                 return value.toLocaleString();
                             },
                             anchor: 'end',
@@ -2471,6 +2503,28 @@
                     }
                 }
             });
+            
+            // 증감 정보 표시
+            if (previousRevenue > 0) {
+                const changeInfoContainer = document.getElementById('revenueChangeInfo');
+                const changeClass = revenueChange >= 0 ? 'positive' : 'negative';
+                const changeText = revenueChange >= 0 ? 
+                    `+${revenueChange.toLocaleString()}` : 
+                    `${revenueChange.toLocaleString()}`;
+                
+                changeInfoContainer.innerHTML = `
+                    <div class="revenue-change-item">
+                        <div class="revenue-change-label">증감액</div>
+                        <div class="revenue-change-value ${changeClass}">${changeText}백만원</div>
+                    </div>
+                    <div class="revenue-change-item">
+                        <div class="revenue-change-label">증감률</div>
+                        <div class="revenue-change-value ${changeClass}">${revenueChangePercent}%</div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('revenueChangeInfo').innerHTML = '';
+            }
         }
         
         // 수익성 차트들 생성 (개선된 버전)
