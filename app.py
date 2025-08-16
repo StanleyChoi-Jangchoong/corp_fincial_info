@@ -1221,6 +1221,17 @@ def get_detailed_financial_analysis(corp_code):
             if any(keyword in account_name for keyword in ['영업', '이자', '감가상각', '무형자산']):
                 print(f"- {account_name}: {item.get('thstrm_amount')}")
         
+        print("=== 현금흐름표 주요 계정들 ===")
+        for item in cf_accounts:
+            account_name = item.get('account_nm', '').strip()
+            if any(keyword in account_name for keyword in ['영업활동', '현금흐름', '영업']):
+                print(f"- {account_name}: {item.get('thstrm_amount')}")
+        
+        print("=== 모든 계정명 (디버깅용) ===")
+        for i, item in enumerate(complete_data['list'][:20]):  # 처음 20개만 출력
+            account_name = item.get('account_nm', '').strip()
+            print(f"{i+1}. {account_name}")
+        
         # 재무제표에서 필요한 계정 추출
         for item in complete_data['list']:
             account_name = item.get('account_nm', '').strip()
