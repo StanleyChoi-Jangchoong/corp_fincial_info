@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>오픈다트 재무 데이터 분석 서비스</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <style>
         * {
             margin: 0;
@@ -1207,7 +1208,8 @@
     </div>
 
     <script>
-
+        // Chart.js DataLabels 플러그인 등록
+        Chart.register(ChartDataLabels);
         
         // 전역 변수
         let currentChart = null;
@@ -2544,11 +2546,32 @@
                         }
                     },
                     scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
                                 text: '금액 (백만원)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            display: true,
+                            color: '#000',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 4,
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value) {
+                                return value > 0 ? value.toLocaleString() + '백만원' : '';
                             }
                         }
                     }
