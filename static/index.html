@@ -2383,13 +2383,20 @@
             }
             
             // EBITDA 추가
-            if (currentDetailedData && currentDetailedData.ebitda !== null) {
+            if (currentDetailedData && currentDetailedData.ebitda !== null && currentDetailedData.ebitda !== undefined) {
                 const ebitdaAmount = Math.round(currentDetailedData.ebitda / 1000000);
                 const ebitdaClass = currentDetailedData.ebitda > 0 ? 'positive' : 'negative';
                 html += `
                     <div class="metric-row">
                         <span class="metric-label">EBITDA</span>
                         <span class="metric-value ${ebitdaClass}">${ebitdaAmount.toLocaleString()}백만원</span>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="metric-row">
+                        <span class="metric-label">EBITDA</span>
+                        <span class="metric-value neutral">데이터 없음</span>
                     </div>
                 `;
             }
@@ -2486,6 +2493,13 @@
                             <span class="metric-value ${coverageClass}">${detailedRatios.interest_coverage_ratio}배</span>
                         </div>
                     `;
+                } else {
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">이자보상비율</span>
+                            <span class="metric-value neutral">데이터 없음</span>
+                        </div>
+                    `;
                 }
                 
                 // 영업활동 현금흐름
@@ -2496,6 +2510,13 @@
                         <div class="metric-row">
                             <span class="metric-label">영업활동 현금흐름</span>
                             <span class="metric-value ${cashFlowClass}">${cashFlowAmount.toLocaleString()}백만원</span>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">영업활동 현금흐름</span>
+                            <span class="metric-value neutral">데이터 없음</span>
                         </div>
                     `;
                 }
@@ -2510,7 +2531,30 @@
                             <span class="metric-value ${roaClass}">${detailedRatios.roa}%</span>
                         </div>
                     `;
+                } else {
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">총자산수익률 (ROA)</span>
+                            <span class="metric-value neutral">데이터 없음</span>
+                        </div>
+                    `;
                 }
+            } else {
+                // 상세 분석 데이터가 없는 경우
+                html += `
+                    <div class="metric-row">
+                        <span class="metric-label">이자보상비율</span>
+                        <span class="metric-value neutral">데이터 없음</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">영업활동 현금흐름</span>
+                        <span class="metric-value neutral">데이터 없음</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">총자산수익률 (ROA)</span>
+                        <span class="metric-value neutral">데이터 없음</span>
+                    </div>
+                `;
             }
             
             html += '</div></div>';
