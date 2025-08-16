@@ -51,6 +51,35 @@ def init_database():
     conn.commit()
     return conn
 
+def create_sample_data(conn):
+    """기본 기업 데이터 생성 (corp.xml 파일이 없을 때 사용)"""
+    cursor = conn.cursor()
+    
+    # 주요 기업들의 샘플 데이터
+    sample_corporations = [
+        ('00126380', '삼성전자', 'Samsung Electronics Co., Ltd.', '005930', '20231231'),
+        ('00164779', 'SK하이닉스', 'SK hynix Inc.', '000660', '20231231'),
+        ('00164779', 'LG에너지솔루션', 'LG Energy Solution, Ltd.', '373220', '20231231'),
+        ('00164779', '현대자동차', 'Hyundai Motor Company', '005380', '20231231'),
+        ('00164779', '기아', 'Kia Corporation', '000270', '20231231'),
+        ('00164779', 'POSCO홀딩스', 'POSCO Holdings Inc.', '005490', '20231231'),
+        ('00164779', 'NAVER', 'NAVER Corporation', '035420', '20231231'),
+        ('00164779', '카카오', 'Kakao Corporation', '035720', '20231231'),
+        ('00164779', 'LG화학', 'LG Chem, Ltd.', '051910', '20231231'),
+        ('00164779', '삼성바이오로직스', 'Samsung Biologics Co., Ltd.', '207940', '20231231'),
+    ]
+    
+    for corp_code, corp_name, corp_eng_name, stock_code, modify_date in sample_corporations:
+        cursor.execute(
+            'INSERT OR REPLACE INTO corporations (corp_code, corp_name, corp_eng_name, stock_code, modify_date) VALUES (?, ?, ?, ?, ?)',
+            (corp_code, corp_name, corp_eng_name, stock_code, modify_date)
+        )
+    
+    conn.commit()
+    global db_loaded
+    db_loaded = True
+    print(f"기본 데이터 생성 완료! 총 {len(sample_corporations)}개 기업")
+
 def load_corp_data(conn):
     """corp.xml 파일을 읽어서 데이터베이스에 로드"""
     global db_loaded
@@ -74,8 +103,10 @@ def load_corp_data(conn):
                 corp_xml_path = 'corp.xml'
                 print(f"현재 디렉토리에서 파일을 찾았습니다: {corp_xml_path}")
             else:
-                print("⚠️  현재 디렉토리에서도 corp.xml 파일을 찾을 수 없습니다.")
-                return
+                        print("⚠️  현재 디렉토리에서도 corp.xml 파일을 찾을 수 없습니다.")
+        print("기본 기업 데이터를 생성합니다...")
+        create_sample_data(conn)
+        return
         
         # XML 파싱
         tree = ET.parse(corp_xml_path)
@@ -121,6 +152,9 @@ def load_corp_data(conn):
         
     except Exception as e:
         print(f"XML 파일 처리 중 오류 발생: {e}")
+        # 파일 로딩 실패 시 기본 데이터 생성
+        print("기본 기업 데이터를 생성합니다...")
+        create_sample_data(conn)
 
 # 데이터베이스 연결 생성
 db_conn = init_database()
