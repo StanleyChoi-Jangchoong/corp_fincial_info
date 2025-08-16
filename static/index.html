@@ -2524,16 +2524,13 @@
                             callbacks: {
                                 label: function(context) {
                                     const value = context.parsed.y;
-                                    return `매출액: ${value.toLocaleString()}백만원`;
+                                    const label = context.label === '전기' ? '전기 매출액' : '당기 매출액';
+                                    return `${label}: ${value.toLocaleString()}백만원`;
                                 }
                             }
                         },
                         legend: {
-                            display: true,
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20
-                            }
+                            display: false
                         }
                     },
                     scales: {
