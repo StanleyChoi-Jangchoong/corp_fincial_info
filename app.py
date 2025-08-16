@@ -1316,6 +1316,9 @@ def get_detailed_financial_analysis(corp_code):
         # EBITDA 직접 확인
         print(f"EBITDA 직접 확인: {ebitda}")
         
+        # EBITDA 최종 확인
+        print(f"EBITDA 최종 확인: {ebitda if ebitda is not None else 'NOT_FOUND'}")
+        
         # 영업활동현금흐름 직접 설정 (디버깅 로그에서 확인된 값)
         financial_metrics['operating_cash_flow'] = 345467000000
         print(f"영업활동현금흐름 설정: {financial_metrics['operating_cash_flow']}")
@@ -1328,6 +1331,9 @@ def get_detailed_financial_analysis(corp_code):
         
         # 영업활동현금흐름 직접 확인
         print(f"영업활동현금흐름 직접 확인: {financial_metrics['operating_cash_flow']}")
+        
+        # 영업활동현금흐름 최종 확인
+        print(f"영업활동현금흐름 최종 확인: {financial_metrics.get('operating_cash_flow', 'NOT_FOUND')}")
         
         # 기존 분석 API에서 영업이익 가져오기 (EBITDA 계산용)
         try:
@@ -1352,6 +1358,9 @@ def get_detailed_financial_analysis(corp_code):
         
         # 영업이익 직접 확인
         print(f"영업이익 직접 확인: {financial_metrics['operating_profit']}")
+        
+        # 영업이익 최종 확인
+        print(f"영업이익 최종 확인: {financial_metrics.get('operating_profit', 'NOT_FOUND')}")
         
         # 재무비율 계산
         ratios = {}
