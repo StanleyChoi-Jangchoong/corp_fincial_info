@@ -124,15 +124,80 @@ def create_sample_data(conn):
     print(f"기본 데이터 생성 완료! 총 {len(sample_corporations)}개 기업")
 
 def load_corp_data(conn):
-    """기업 데이터 로드 (Render 배포를 위해 기본 데이터 우선 사용)"""
+    """corp.xml 파일을 읽어서 데이터베이스에 로드"""
     global db_loaded
     
     if db_loaded:
         return
     
-    # Render 배포 환경에서는 기본 데이터를 바로 생성
-    print("기본 기업 데이터를 생성합니다...")
-    create_sample_data(conn)
+    try:
+        print("corp.xml 파일을 읽어서 데이터베이스에 로드 중...")
+        
+        # 현재 스크립트의 디렉토리를 기준으로 파일 경로 설정
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        corp_xml_path = os.path.join(script_dir, 'corp.xml')
+        
+        print(f"파일 경로: {corp_xml_path}")
+        
+        if not os.path.exists(corp_xml_path):
+            print(f"⚠️  corp.xml 파일을 찾을 수 없습니다. 경로: {corp_xml_path}")
+            # 현재 디렉토리에서도 시도
+            if os.path.exists('corp.xml'):
+                corp_xml_path = 'corp.xml'
+                print(f"현재 디렉토리에서 파일을 찾았습니다: {corp_xml_path}")
+            else:
+                print("⚠️  현재 디렉토리에서도 corp.xml 파일을 찾을 수 없습니다.")
+                print("기본 기업 데이터를 생성합니다...")
+                create_sample_data(conn)
+                return
+        
+        # XML 파싱
+        tree = ET.parse(corp_xml_path)
+        root = tree.getroot()
+        
+        cursor = conn.cursor()
+        
+        count = 0
+        for corp_list in root.findall('list'):
+            corp_code = corp_list.find('corp_code')
+            corp_name = corp_list.find('corp_name')
+            corp_eng_name = corp_list.find('corp_eng_name')
+            stock_code = corp_list.find('stock_code')
+            modify_date = corp_list.find('modify_date')
+            
+            # 텍스트 추출
+            corp_code_text = corp_code.text if corp_code is not None else None
+            corp_name_text = corp_name.text if corp_name is not None else None
+            corp_eng_name_text = corp_eng_name.text if corp_eng_name is not None else None
+            stock_code_text = stock_code.text if stock_code is not None else None
+            modify_date_text = modify_date.text if modify_date is not None else None
+            
+            # 빈 문자열을 None으로 처리
+            if corp_eng_name_text and corp_eng_name_text.strip() == '':
+                corp_eng_name_text = None
+            if stock_code_text and stock_code_text.strip() == '':
+                stock_code_text = None
+            
+            if corp_code_text and corp_name_text:
+                cursor.execute(
+                    'INSERT OR REPLACE INTO corporations (corp_code, corp_name, corp_eng_name, stock_code, modify_date) VALUES (?, ?, ?, ?, ?)',
+                    (corp_code_text, corp_name_text, corp_eng_name_text, stock_code_text, modify_date_text)
+                )
+                count += 1
+                
+                # 진행 상황 출력 (1000개마다)
+                if count % 1000 == 0:
+                    print(f"처리된 기업 수: {count}")
+        
+        conn.commit()
+        db_loaded = True
+        print(f"데이터 로드 완료! 총 {count}개 기업")
+        
+    except Exception as e:
+        print(f"XML 파일 처리 중 오류 발생: {e}")
+        # 파일 로딩 실패 시 기본 데이터 생성
+        print("기본 기업 데이터를 생성합니다...")
+        create_sample_data(conn)
 
 # 데이터베이스 연결 생성
 db_conn = init_database()
