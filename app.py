@@ -362,6 +362,17 @@ def get_financial_statements(corp_code, bsns_year, reprt_code):
     
     return call_opendart_api('fnlttSinglAcnt.json', params)
 
+def get_complete_financial_statements(corp_code, bsns_year, reprt_code, fs_div='OFS'):
+    """단일회사 전체 재무제표 API를 통해 상세 재무 데이터 조회"""
+    params = {
+        'corp_code': corp_code,
+        'bsns_year': bsns_year,
+        'reprt_code': reprt_code,
+        'fs_div': fs_div  # OFS: 개별재무제표, CFS: 연결재무제표
+    }
+    
+    return call_opendart_api('fnlttSinglAcntAll.json', params)
+
 def format_financial_data(financial_data):
     """재무 데이터 포맷팅"""
     if 'error' in financial_data:
@@ -1159,6 +1170,115 @@ def get_ai_summary(corp_code):
         
     except Exception as e:
         return jsonify({'error': f'AI 요약 생성 중 오류가 발생했습니다: {str(e)}'}), 500
+
+@app.route('/api/financial/<corp_code>/detailed-analysis')
+def get_detailed_financial_analysis(corp_code):
+    """상세 재무 분석 - EBITDA, 추가 재무비율 포함"""
+    bsns_year = request.args.get('year', str(datetime.now().year - 1))
+    reprt_code = request.args.get('report', '11011')
+    fs_div = request.args.get('fs_div', 'OFS')  # OFS: 개별, CFS: 연결
+    
+    try:
+        # 단일회사 전체 재무제표 데이터 조회
+        complete_data = get_complete_financial_statements(corp_code, bsns_year, reprt_code, fs_div)
+        
+        if 'error' in complete_data:
+            return jsonify(complete_data), 400
+        
+        if not complete_data.get('list'):
+            return jsonify({'error': '조회된 재무 데이터가 없습니다.'}), 400
+        
+        # EBITDA 및 추가 재무비율 계산을 위한 데이터 추출
+        financial_metrics = {
+            'ebitda': None,  # EBITDA
+            'interest_expense': None,  # 이자비용
+            'operating_cash_flow': None,  # 영업활동 현금흐름
+            'total_assets': None,  # 총자산
+            'total_liabilities': None,  # 총부채
+            'total_equity': None,  # 총자본
+            'operating_profit': None,  # 영업이익
+            'depreciation': None,  # 감가상각비
+            'amortization': None,  # 무형자산상각비
+        }
+        
+        # 재무제표에서 필요한 계정 추출
+        for item in complete_data['list']:
+            account_name = item.get('account_nm', '').strip()
+            current_amount = item.get('thstrm_amount')
+            
+            if not current_amount or not current_amount.replace(',', '').replace('-', '').isdigit():
+                continue
+                
+            amount = int(current_amount.replace(',', ''))
+            
+            # 재무상태표 (BS)
+            if item.get('sj_div') == 'BS':
+                if '자산총계' in account_name:
+                    financial_metrics['total_assets'] = amount
+                elif '부채총계' in account_name:
+                    financial_metrics['total_liabilities'] = amount
+                elif '자본총계' in account_name:
+                    financial_metrics['total_equity'] = amount
+            
+            # 손익계산서 (IS)
+            elif item.get('sj_div') == 'IS':
+                if '영업이익' in account_name and '영업이익(손실)' not in account_name:
+                    financial_metrics['operating_profit'] = amount
+                elif '영업이익(손실)' in account_name:
+                    financial_metrics['operating_profit'] = amount
+                elif '이자비용' in account_name or '이자비용(수익)' in account_name:
+                    financial_metrics['interest_expense'] = amount
+                elif '감가상각비' in account_name:
+                    financial_metrics['depreciation'] = amount
+                elif '무형자산상각비' in account_name or '무형자산상각' in account_name:
+                    financial_metrics['amortization'] = amount
+            
+            # 현금흐름표 (CF)
+            elif item.get('sj_div') == 'CF':
+                if '영업활동으로 인한 현금흐름' in account_name or '영업활동 현금흐름' in account_name:
+                    financial_metrics['operating_cash_flow'] = amount
+        
+        # EBITDA 계산
+        ebitda = None
+        if financial_metrics['operating_profit'] is not None:
+            ebitda = financial_metrics['operating_profit']
+            if financial_metrics['depreciation'] is not None:
+                ebitda += financial_metrics['depreciation']
+            if financial_metrics['amortization'] is not None:
+                ebitda += financial_metrics['amortization']
+        
+        # 재무비율 계산
+        ratios = {}
+        
+        # 부채비율 = (총부채 / 총자본) * 100
+        if financial_metrics['total_liabilities'] and financial_metrics['total_equity']:
+            ratios['debt_to_equity_ratio'] = round((financial_metrics['total_liabilities'] / financial_metrics['total_equity']) * 100, 2)
+        
+        # 이자보상비율 = EBITDA / 이자비용
+        if ebitda and financial_metrics['interest_expense'] and financial_metrics['interest_expense'] != 0:
+            ratios['interest_coverage_ratio'] = round(ebitda / abs(financial_metrics['interest_expense']), 2)
+        
+        # 자기자본비율 = (총자본 / 총자산) * 100
+        if financial_metrics['total_equity'] and financial_metrics['total_assets']:
+            ratios['equity_ratio'] = round((financial_metrics['total_equity'] / financial_metrics['total_assets']) * 100, 2)
+        
+        # 총자산수익률(ROA) = 영업이익 / 총자산 * 100
+        if financial_metrics['operating_profit'] and financial_metrics['total_assets']:
+            ratios['roa'] = round((financial_metrics['operating_profit'] / financial_metrics['total_assets']) * 100, 2)
+        
+        return jsonify({
+            'company_info': {
+                'bsns_year': complete_data['list'][0].get('bsns_year'),
+                'stock_code': complete_data['list'][0].get('stock_code'),
+                'reprt_code': complete_data['list'][0].get('reprt_code')
+            },
+            'ebitda': ebitda,
+            'financial_metrics': financial_metrics,
+            'ratios': ratios
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'상세 재무 분석 중 오류가 발생했습니다: {str(e)}'}), 500
 
 if __name__ == '__main__':
     # 데이터를 먼저 로드 (동기적으로)

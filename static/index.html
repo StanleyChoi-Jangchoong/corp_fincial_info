@@ -1228,6 +1228,7 @@
         };
         let currentAnalysisData = null;
         let currentBalanceData = null;
+        let currentDetailedData = null;
         let currentAiData = null;
         
         // 디바운싱을 위한 타이머 변수
@@ -1410,19 +1411,22 @@
                 document.getElementById('financialSummary').innerHTML = '<div class="loading">📊 재무 데이터 로딩 중...</div>';
                 
                 // 기본 요약 데이터, 상세 분석 데이터, 재무구조 데이터를 병렬로 로드
-                const [summaryResponse, analysisResponse, balanceResponse] = await Promise.all([
+                const [summaryResponse, analysisResponse, balanceResponse, detailedResponse] = await Promise.all([
                     fetch(`/api/financial/${currentCorpCode}/summary?year=${year}&report=${report}`),
                     fetch(`/api/financial/${currentCorpCode}/analysis?year=${year}&report=${report}`),
-                    fetch(`/api/financial/${currentCorpCode}/balance-structure?year=${year}&report=${report}`)
+                    fetch(`/api/financial/${currentCorpCode}/balance-structure?year=${year}&report=${report}`),
+                    fetch(`/api/financial/${currentCorpCode}/detailed-analysis?year=${year}&report=${report}`)
                 ]);
                 
                 if (summaryResponse.ok && analysisResponse.ok) {
                     const summaryData = await summaryResponse.json();
                     const analysisData = await analysisResponse.json();
                     const balanceData = balanceResponse.ok ? await balanceResponse.json() : null;
+                    const detailedData = detailedResponse.ok ? await detailedResponse.json() : null;
                     
                     currentAnalysisData = analysisData;
                     currentBalanceData = balanceData;
+                    currentDetailedData = detailedData;
                     
                     displayFinancialSummary(summaryData);
                     createFinancialChart(summaryData);
@@ -2378,6 +2382,18 @@
                 `;
             }
             
+            // EBITDA 추가
+            if (currentDetailedData && currentDetailedData.ebitda !== null) {
+                const ebitdaAmount = Math.round(currentDetailedData.ebitda / 1000000);
+                const ebitdaClass = currentDetailedData.ebitda > 0 ? 'positive' : 'negative';
+                html += `
+                    <div class="metric-row">
+                        <span class="metric-label">EBITDA</span>
+                        <span class="metric-value ${ebitdaClass}">${ebitdaAmount.toLocaleString()}백만원</span>
+                    </div>
+                `;
+            }
+            
             html += '</div>';
             
             // ROA, ROE
@@ -2454,6 +2470,47 @@
                         <span class="metric-value ${debtAssetsClass}">${ratios.debt_to_assets_ratio}%</span>
                     </div>
                 `;
+            }
+            
+            // 상세 분석 데이터에서 추가 비율들 표시
+            if (currentDetailedData && currentDetailedData.ratios) {
+                const detailedRatios = currentDetailedData.ratios;
+                
+                // 이자보상비율
+                if (detailedRatios.interest_coverage_ratio !== undefined) {
+                    const coverageClass = detailedRatios.interest_coverage_ratio > 3 ? 'positive' : 
+                                         detailedRatios.interest_coverage_ratio > 1.5 ? 'neutral' : 'negative';
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">이자보상비율</span>
+                            <span class="metric-value ${coverageClass}">${detailedRatios.interest_coverage_ratio}배</span>
+                        </div>
+                    `;
+                }
+                
+                // 영업활동 현금흐름
+                if (currentDetailedData.financial_metrics && currentDetailedData.financial_metrics.operating_cash_flow !== null) {
+                    const cashFlowAmount = Math.round(currentDetailedData.financial_metrics.operating_cash_flow / 1000000);
+                    const cashFlowClass = currentDetailedData.financial_metrics.operating_cash_flow > 0 ? 'positive' : 'negative';
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">영업활동 현금흐름</span>
+                            <span class="metric-value ${cashFlowClass}">${cashFlowAmount.toLocaleString()}백만원</span>
+                        </div>
+                    `;
+                }
+                
+                // 총자산수익률 (ROA)
+                if (detailedRatios.roa !== undefined) {
+                    const roaClass = detailedRatios.roa > 5 ? 'positive' : 
+                                    detailedRatios.roa > 2 ? 'neutral' : 'negative';
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">총자산수익률 (ROA)</span>
+                            <span class="metric-value ${roaClass}">${detailedRatios.roa}%</span>
+                        </div>
+                    `;
+                }
             }
             
             html += '</div></div>';
