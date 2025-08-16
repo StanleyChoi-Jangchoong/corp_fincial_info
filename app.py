@@ -1230,7 +1230,12 @@ def get_detailed_financial_analysis(corp_code):
         print("=== 모든 계정명 (디버깅용) ===")
         for i, item in enumerate(complete_data['list'][:20]):  # 처음 20개만 출력
             account_name = item.get('account_nm', '').strip()
-            print(f"{i+1}. {account_name}")
+            sj_div = item.get('sj_div', 'N/A')
+            print(f"{i+1}. [{sj_div}] {account_name}")
+        
+        print("=== sj_div 값들 확인 ===")
+        sj_div_values = set(item.get('sj_div') for item in complete_data['list'])
+        print(f"발견된 sj_div 값들: {sj_div_values}")
         
         # 재무제표에서 필요한 계정 추출
         for item in complete_data['list']:
