@@ -1450,6 +1450,17 @@ def get_detailed_financial_analysis(corp_code):
             print(f"processed_count: {processed_count}")
             print(f"complete_data keys: {list(complete_data.keys()) if complete_data else 'None'}")
             print(f"complete_data list length: {len(complete_data.get('list', [])) if complete_data else 0}")
+            
+            # 동국제강의 경우 처음 10개 계정 출력
+            if complete_data and 'list' in complete_data and len(complete_data['list']) > 0:
+                print("=== 동국제강 처음 10개 계정 ===")
+                for i, item in enumerate(complete_data['list'][:10]):
+                    account_name = item.get('account_nm', '').strip()
+                    sj_div = item.get('sj_div', 'N/A')
+                    amount = item.get('thstrm_amount')
+                    print(f"{i+1}. [{sj_div}] {account_name}: {amount}")
+            else:
+                print("=== 동국제강 complete_data가 비어있음 ===")
         
         # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
