@@ -1389,7 +1389,7 @@ def get_detailed_financial_analysis(corp_code):
                         financial_metrics['operating_profit'] = amount
                 
                 # 이자비용 매칭 개선
-                if any(keyword in account_name for keyword in ['이자비용', '이자비용(수익)', '이자비용(손실)', '이자비용(수익)']):
+                if any(keyword in account_name for keyword in ['이자비용', '이자비용(수익)', '이자비용(손실)', '이자비용(수익)', '이자의 지급', '이자지급', '금융원가', '금융비용', '금융비용(손실)']):
                     financial_metrics['interest_expense'] = amount
                 
                 # 감가상각비 매칭 개선
