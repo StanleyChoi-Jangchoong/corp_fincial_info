@@ -1448,6 +1448,8 @@ def get_detailed_financial_analysis(corp_code):
             print(f"operating_profit: {financial_metrics.get('operating_profit')}")
             print(f"interest_expense: {financial_metrics.get('interest_expense')}")
             print(f"processed_count: {processed_count}")
+            print(f"complete_data keys: {list(complete_data.keys()) if complete_data else 'None'}")
+            print(f"complete_data list length: {len(complete_data.get('list', [])) if complete_data else 0}")
         
         # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
