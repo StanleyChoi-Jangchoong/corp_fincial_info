@@ -1378,6 +1378,8 @@ def get_detailed_financial_analysis(corp_code):
             print(f"{i+1}. {account_name}")
         
         # 재무제표에서 필요한 계정 추출
+        print(f"=== 계정 추출 시작 (총 {len(complete_data['list'])}개 계정) ===")
+        processed_count = 0
         for item in complete_data['list']:
             account_name = item.get('account_nm', '').strip()
             current_amount = item.get('thstrm_amount')
@@ -1386,6 +1388,7 @@ def get_detailed_financial_analysis(corp_code):
                 continue
                 
             amount = int(current_amount.replace(',', ''))
+            processed_count += 1
             
             # 동국제강의 경우 모든 계정 처리 과정 출력
             if corp_code == '01765265' and any(keyword in account_name for keyword in ['이자', '금융', '비용']):
