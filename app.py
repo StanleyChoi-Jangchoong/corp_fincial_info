@@ -1439,6 +1439,16 @@ def get_detailed_financial_analysis(corp_code):
                 if corp_code == '01765265':
                     print(f"현금흐름표 계정: {account_name} = {amount}")
         
+        # 동국제강의 경우 financial_metrics 상태 출력
+        if corp_code == '01765265':
+            print(f"=== 동국제강 financial_metrics 상태 ===")
+            print(f"total_assets: {financial_metrics.get('total_assets')}")
+            print(f"total_liabilities: {financial_metrics.get('total_liabilities')}")
+            print(f"total_equity: {financial_metrics.get('total_equity')}")
+            print(f"operating_profit: {financial_metrics.get('operating_profit')}")
+            print(f"interest_expense: {financial_metrics.get('interest_expense')}")
+            print(f"processed_count: {processed_count}")
+        
         # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
         if financial_metrics['operating_profit'] is not None:
