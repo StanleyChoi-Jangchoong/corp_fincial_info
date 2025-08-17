@@ -1035,9 +1035,7 @@ def get_ai_analysis(corp_code):
                     key_accounts['net_income'] = amount
                 elif any(keyword in account_name for keyword in ['이자비용', '금융비용', '이자비용(손실)', '금융비용(손실)']):
                     key_accounts['interest_expense'] = amount
-                elif any(keyword in account_name for keyword in ['기타영업외비용', '기타영업외비용(손실)']):
-                    # 기타영업외비용에 이자비용이 포함될 수 있음
-                    key_accounts['other_expenses'] = amount
+
         
         # 연결재무제표로 보완 (필요한 데이터가 없는 경우)
         for item in summary_data.get('list', []):
@@ -1077,9 +1075,7 @@ def get_ai_analysis(corp_code):
                     key_accounts['net_income'] = amount
                 elif any(keyword in account_name for keyword in ['이자비용', '금융비용', '이자비용(손실)', '금융비용(손실)']) and 'interest_expense' not in key_accounts:
                     key_accounts['interest_expense'] = amount
-                elif any(keyword in account_name for keyword in ['기타영업외비용', '기타영업외비용(손실)']) and 'other_expenses' not in key_accounts:
-                    # 기타영업외비용에 이자비용이 포함될 수 있음
-                    key_accounts['other_expenses'] = amount
+
         
         # 디버깅용 로그
         print(f"AI Analysis - Extracted key_accounts for {corp_code}: {key_accounts}")
@@ -1118,9 +1114,6 @@ def get_ai_analysis(corp_code):
                 
                 # 이자보상비율 계산
                 interest_expense = key_accounts.get('interest_expense', 0)
-                if not interest_expense or interest_expense == 0:
-                    # 이자비용이 없으면 기타영업외비용을 대안으로 사용
-                    interest_expense = key_accounts.get('other_expenses', 0)
                 
                 if interest_expense and interest_expense != 0:
                     operating_profit = key_accounts.get('operating_profit', 0)
