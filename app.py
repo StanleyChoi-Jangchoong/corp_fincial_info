@@ -1387,6 +1387,10 @@ def get_detailed_financial_analysis(corp_code):
                 
             amount = int(current_amount.replace(',', ''))
             
+            # 동국제강의 경우 모든 계정 처리 과정 출력
+            if corp_code == '01765265' and any(keyword in account_name for keyword in ['이자', '금융', '비용']):
+                print(f"처리 중: [{item.get('sj_div')}] {account_name} = {amount}")
+            
             # 재무상태표 (BS)
             if item.get('sj_div') == 'BS':
                 if '자산총계' in account_name:
