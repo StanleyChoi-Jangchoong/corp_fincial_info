@@ -1349,6 +1349,16 @@ def get_detailed_financial_analysis(corp_code):
             sj_div = item.get('sj_div', 'N/A')
             print(f"{i+1}. [{sj_div}] {account_name}")
         
+        # 동국제강의 경우 이자비용 관련 계정들 모두 출력
+        if corp_code == '01765265':
+            print("=== 동국제강 이자비용 관련 계정들 ===")
+            for item in complete_data['list']:
+                account_name = item.get('account_nm', '').strip()
+                if any(keyword in account_name for keyword in ['이자', '금융', '비용']):
+                    amount = item.get('thstrm_amount')
+                    sj_div = item.get('sj_div', 'N/A')
+                    print(f"[{sj_div}] {account_name}: {amount}")
+        
         print("=== sj_div 값들 확인 ===")
         sj_div_values = set(item.get('sj_div') for item in complete_data['list'])
         print(f"발견된 sj_div 값들: {sj_div_values}")
@@ -1391,6 +1401,7 @@ def get_detailed_financial_analysis(corp_code):
                 # 이자비용 매칭 개선
                 if any(keyword in account_name for keyword in ['이자비용', '이자비용(수익)', '이자비용(손실)', '이자비용(수익)', '이자의 지급', '이자지급', '금융원가', '금융비용', '금융비용(손실)']):
                     financial_metrics['interest_expense'] = amount
+                    print(f"이자비용 발견: {account_name} = {amount}")
                 
                 # 감가상각비 매칭 개선
                 if any(keyword in account_name for keyword in ['감가상각비', '감가상각', '감가상각비용']):
