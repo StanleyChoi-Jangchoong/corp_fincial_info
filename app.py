@@ -1358,6 +1358,13 @@ def get_detailed_financial_analysis(corp_code):
                     amount = item.get('thstrm_amount')
                     sj_div = item.get('sj_div', 'N/A')
                     print(f"[{sj_div}] {account_name}: {amount}")
+            
+            print("=== 동국제강 모든 계정명 (처음 50개) ===")
+            for i, item in enumerate(complete_data['list'][:50]):
+                account_name = item.get('account_nm', '').strip()
+                sj_div = item.get('sj_div', 'N/A')
+                amount = item.get('thstrm_amount')
+                print(f"{i+1}. [{sj_div}] {account_name}: {amount}")
         
         print("=== sj_div 값들 확인 ===")
         sj_div_values = set(item.get('sj_div') for item in complete_data['list'])
