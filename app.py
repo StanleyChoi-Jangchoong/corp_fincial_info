@@ -1070,6 +1070,8 @@ def get_ai_analysis(corp_code):
                     key_accounts['net_income'] = amount
                 elif '당기순이익(손실)' in account_name and 'net_income' not in key_accounts:
                     key_accounts['net_income'] = amount
+                elif '이자비용' in account_name and 'interest_expense' not in key_accounts:
+                    key_accounts['interest_expense'] = amount
         
         # 디버깅용 로그
         print(f"AI Analysis - Extracted key_accounts for {corp_code}: {key_accounts}")
@@ -1099,6 +1101,19 @@ def get_ai_analysis(corp_code):
                 debt = key_accounts.get('liabilities', 0)
                 financial_ratios['debt_to_equity_ratio'] = round((debt / equity) * 100, 2) if debt else 0
                 financial_ratios['equity_ratio'] = round((equity / assets) * 100, 2) if assets else 0
+                
+                # ROE, ROA 추가
+                if net_income:
+                    financial_ratios['roe'] = round((net_income / equity) * 100, 2)
+                    if assets:
+                        financial_ratios['roa'] = round((net_income / assets) * 100, 2)
+                
+                # 이자보상비율 계산
+                interest_expense = key_accounts.get('interest_expense', 0)
+                if interest_expense and interest_expense != 0:
+                    operating_profit = key_accounts.get('operating_profit', 0)
+                    if operating_profit:
+                        financial_ratios['interest_coverage_ratio'] = round(operating_profit / abs(interest_expense), 2)
             
             analysis_result = {
                 'profitability_analysis': profitability_analysis,
@@ -1191,6 +1206,8 @@ def get_ai_summary(corp_code):
                     key_accounts['net_income'] = amount
                 elif '당기순이익(손실)' in account_name:
                     key_accounts['net_income'] = amount
+                elif '이자비용' in account_name:
+                    key_accounts['interest_expense'] = amount
         
         # 연결재무제표로 보완 (OFS 데이터가 없는 경우)
         if not key_accounts:
