@@ -1415,6 +1415,11 @@ def get_detailed_financial_analysis(corp_code):
             elif item.get('sj_div') == 'CF':
                 if any(keyword in account_name for keyword in ['영업활동으로 인한 현금흐름', '영업활동 현금흐름', '영업활동 현금흐름(손실)', '영업활동현금흐름']):
                     financial_metrics['operating_cash_flow'] = amount
+                
+                # 현금흐름표에서 이자비용 찾기 (이자의 지급 등)
+                if any(keyword in account_name for keyword in ['이자비용', '이자비용(수익)', '이자비용(손실)', '이자비용(수익)', '이자의 지급', '이자지급', '금융원가', '금융비용', '금융비용(손실)']):
+                    financial_metrics['interest_expense'] = amount
+                    print(f"현금흐름표에서 이자비용 발견: {account_name} = {amount}")
         
         # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
