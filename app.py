@@ -1035,7 +1035,7 @@ def get_ai_analysis(corp_code):
                     key_accounts['net_income'] = amount
                 elif any(keyword in account_name for keyword in ['이자비용', '금융비용', '이자비용(손실)', '금융비용(손실)']):
                     key_accounts['interest_expense'] = amount
-                elif '기타영업외비용' in account_name:
+                elif any(keyword in account_name for keyword in ['기타영업외비용', '기타영업외비용(손실)']):
                     # 기타영업외비용에 이자비용이 포함될 수 있음
                     key_accounts['other_expenses'] = amount
         
@@ -1077,7 +1077,7 @@ def get_ai_analysis(corp_code):
                     key_accounts['net_income'] = amount
                 elif any(keyword in account_name for keyword in ['이자비용', '금융비용', '이자비용(손실)', '금융비용(손실)']) and 'interest_expense' not in key_accounts:
                     key_accounts['interest_expense'] = amount
-                elif '기타영업외비용' in account_name and 'other_expenses' not in key_accounts:
+                elif any(keyword in account_name for keyword in ['기타영업외비용', '기타영업외비용(손실)']) and 'other_expenses' not in key_accounts:
                     # 기타영업외비용에 이자비용이 포함될 수 있음
                     key_accounts['other_expenses'] = amount
         
