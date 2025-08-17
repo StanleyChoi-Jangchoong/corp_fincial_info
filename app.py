@@ -1033,7 +1033,7 @@ def get_ai_analysis(corp_code):
                     key_accounts['net_income'] = amount
                 elif '당기순이익(손실)' in account_name:
                     key_accounts['net_income'] = amount
-                elif '이자비용' in account_name:
+                elif '이자비용' in account_name or '금융비용' in account_name:
                     key_accounts['interest_expense'] = amount
         
         # 연결재무제표로 보완 (필요한 데이터가 없는 경우)
@@ -1072,7 +1072,7 @@ def get_ai_analysis(corp_code):
                     key_accounts['net_income'] = amount
                 elif '당기순이익(손실)' in account_name and 'net_income' not in key_accounts:
                     key_accounts['net_income'] = amount
-                elif '이자비용' in account_name and 'interest_expense' not in key_accounts:
+                elif ('이자비용' in account_name or '금융비용' in account_name) and 'interest_expense' not in key_accounts:
                     key_accounts['interest_expense'] = amount
         
         # 디버깅용 로그
