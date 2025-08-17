@@ -1349,23 +1349,6 @@ def get_detailed_financial_analysis(corp_code):
             sj_div = item.get('sj_div', 'N/A')
             print(f"{i+1}. [{sj_div}] {account_name}")
         
-        # 동국제강의 경우 이자비용 관련 계정들 모두 출력
-        if corp_code == '01765265':
-            print("=== 동국제강 이자비용 관련 계정들 ===")
-            for item in complete_data['list']:
-                account_name = item.get('account_nm', '').strip()
-                if any(keyword in account_name for keyword in ['이자', '금융', '비용']):
-                    amount = item.get('thstrm_amount')
-                    sj_div = item.get('sj_div', 'N/A')
-                    print(f"[{sj_div}] {account_name}: {amount}")
-            
-            print("=== 동국제강 모든 계정명 (처음 50개) ===")
-            for i, item in enumerate(complete_data['list'][:50]):
-                account_name = item.get('account_nm', '').strip()
-                sj_div = item.get('sj_div', 'N/A')
-                amount = item.get('thstrm_amount')
-                print(f"{i+1}. [{sj_div}] {account_name}: {amount}")
-        
         print("=== sj_div 값들 확인 ===")
         sj_div_values = set(item.get('sj_div') for item in complete_data['list'])
         print(f"발견된 sj_div 값들: {sj_div_values}")
@@ -1378,8 +1361,6 @@ def get_detailed_financial_analysis(corp_code):
             print(f"{i+1}. {account_name}")
         
         # 재무제표에서 필요한 계정 추출
-        print(f"=== 계정 추출 시작 (총 {len(complete_data['list'])}개 계정) ===")
-        processed_count = 0
         for item in complete_data['list']:
             account_name = item.get('account_nm', '').strip()
             current_amount = item.get('thstrm_amount')
@@ -1388,11 +1369,6 @@ def get_detailed_financial_analysis(corp_code):
                 continue
                 
             amount = int(current_amount.replace(',', ''))
-            processed_count += 1
-            
-            # 동국제강의 경우 모든 계정 처리 과정 출력
-            if corp_code == '01765265' and any(keyword in account_name for keyword in ['이자', '금융', '비용']):
-                print(f"처리 중: [{item.get('sj_div')}] {account_name} = {amount}")
             
             # 재무상태표 (BS)
             if item.get('sj_div') == 'BS':
@@ -1415,7 +1391,6 @@ def get_detailed_financial_analysis(corp_code):
                 # 이자비용 매칭 개선
                 if any(keyword in account_name for keyword in ['이자비용', '이자비용(수익)', '이자비용(손실)', '이자비용(수익)', '이자의 지급', '이자지급', '금융원가', '금융비용', '금융비용(손실)']):
                     financial_metrics['interest_expense'] = amount
-                    print(f"이자비용 발견: {account_name} = {amount}")
                 
                 # 감가상각비 매칭 개선
                 if any(keyword in account_name for keyword in ['감가상각비', '감가상각', '감가상각비용']):
@@ -1429,46 +1404,6 @@ def get_detailed_financial_analysis(corp_code):
             elif item.get('sj_div') == 'CF':
                 if any(keyword in account_name for keyword in ['영업활동으로 인한 현금흐름', '영업활동 현금흐름', '영업활동 현금흐름(손실)', '영업활동현금흐름']):
                     financial_metrics['operating_cash_flow'] = amount
-                
-                # 현금흐름표에서 이자비용 찾기 (이자의 지급 등)
-                if any(keyword in account_name for keyword in ['이자비용', '이자비용(수익)', '이자비용(손실)', '이자비용(수익)', '이자의 지급', '이자지급', '금융원가', '금융비용', '금융비용(손실)']):
-                    financial_metrics['interest_expense'] = amount
-                    print(f"현금흐름표에서 이자비용 발견: {account_name} = {amount}")
-                
-                # 동국제강의 경우 현금흐름표 모든 계정 출력
-                if corp_code == '01765265':
-                    print(f"현금흐름표 계정: {account_name} = {amount}")
-        
-        # 동국제강의 경우 financial_metrics 상태 출력
-        if corp_code == '01765265':
-            print(f"=== 동국제강 financial_metrics 상태 ===")
-            print(f"total_assets: {financial_metrics.get('total_assets')}")
-            print(f"total_liabilities: {financial_metrics.get('total_liabilities')}")
-            print(f"total_equity: {financial_metrics.get('total_equity')}")
-            print(f"operating_profit: {financial_metrics.get('operating_profit')}")
-            print(f"interest_expense: {financial_metrics.get('interest_expense')}")
-            print(f"processed_count: {processed_count}")
-            print(f"complete_data keys: {list(complete_data.keys()) if complete_data else 'None'}")
-            print(f"complete_data list length: {len(complete_data.get('list', [])) if complete_data else 0}")
-            
-            # 동국제강의 경우 처음 10개 계정 출력
-            if complete_data and 'list' in complete_data and len(complete_data['list']) > 0:
-                print("=== 동국제강 처음 10개 계정 ===")
-                for i, item in enumerate(complete_data['list'][:10]):
-                    account_name = item.get('account_nm', '').strip()
-                    sj_div = item.get('sj_div', 'N/A')
-                    amount = item.get('thstrm_amount')
-                    print(f"{i+1}. [{sj_div}] {account_name}: {amount}")
-            else:
-                print("=== 동국제강 complete_data가 비어있음 ===")
-                
-            # 동국제강의 경우 API 응답 상태 출력
-            print(f"=== 동국제강 API 응답 상태 ===")
-            print(f"API 응답이 성공적으로 받아졌는지 확인")
-            print(f"=== 동국제강 디버깅 시작 ===")
-            print(f"corp_code: {corp_code}")
-            print(f"year: {year}")
-            print(f"report: {report}")
         
         # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
