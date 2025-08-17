@@ -1465,6 +1465,10 @@ def get_detailed_financial_analysis(corp_code):
             # 동국제강의 경우 API 응답 상태 출력
             print(f"=== 동국제강 API 응답 상태 ===")
             print(f"API 응답이 성공적으로 받아졌는지 확인")
+            print(f"=== 동국제강 디버깅 시작 ===")
+            print(f"corp_code: {corp_code}")
+            print(f"year: {year}")
+            print(f"report: {report}")
         
         # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
