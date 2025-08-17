@@ -687,18 +687,19 @@ def get_balance_structure(corp_code):
     liabilities_items = {}
     equity_items = {}
     
-    # 금융기관 여부 확인 (매출액이 없거나 매우 작은 경우)
+    # 금융기관 여부 확인 (금융기관 특화 계정이 있는지 확인)
     is_financial_institution = False
-    revenue_found = False
+    financial_accounts_found = []
     
     for item in financial_data['list']:
-        if item.get('sj_div') == 'IS':  # 손익계산서에서 매출액 확인
+        if item.get('sj_div') == 'BS':  # 재무상태표에서 금융기관 특화 계정 확인
             account_name = item.get('account_nm', '').strip()
-            if '매출액' in account_name or '매출' in account_name:
-                revenue_found = True
-                break
+            if any(keyword in account_name for keyword in ['예수부채', '보험계약부채', '공정가치측정금융자산', '보험계약자산']):
+                financial_accounts_found.append(account_name)
     
-    is_financial_institution = not revenue_found
+    is_financial_institution = len(financial_accounts_found) > 0
+    if is_financial_institution:
+        print(f"금융기관 특화 계정 발견: {financial_accounts_found}")
     
     for item in financial_data['list']:
         if item.get('sj_div') != 'BS':  # 재무상태표가 아닌 경우 건너뛰기
@@ -719,64 +720,70 @@ def get_balance_structure(corp_code):
         # 자산 항목들
         if '자산총계' in account_name:
             balance_structure['balance_equation']['total_assets'] = amount
-        elif '유동자산' in account_name and '비유동자산' not in account_name:
-            # 유동자산은 가장 큰 값을 사용 (최신 데이터)
-            if 'current_assets' not in assets_items or amount > assets_items['current_assets']:
-                assets_items['current_assets'] = amount
-        elif '비유동자산' in account_name:
-            # 비유동자산은 가장 큰 값을 사용 (최신 데이터)
-            if 'non_current_assets' not in assets_items or amount > assets_items['non_current_assets']:
-                assets_items['non_current_assets'] = amount
-        elif '재고자산' in account_name:
-            assets_items['inventory'] = amount
-        elif '매출채권' in account_name or '수취채권' in account_name:
-            assets_items['receivables'] = amount
-        elif '현금' in account_name or '예치금' in account_name:
-            assets_items['cash'] = amount
-        elif '대출채권' in account_name or '대출' in account_name:
-            assets_items['loans'] = amount
-        # 금융기관 특화 자산 항목들
-        elif '공정가치측정금융자산' in account_name:
-            assets_items['fair_value_assets'] = amount
-            print(f"자산 구성 추가: 공정가치측정금융자산 = {amount}")
-        elif '보험계약자산' in account_name:
-            assets_items['insurance_assets'] = amount
-            print(f"자산 구성 추가: 보험계약자산 = {amount}")
-        elif '파생상품자산' in account_name:
-            assets_items['derivative_assets'] = amount
-            print(f"자산 구성 추가: 파생상품자산 = {amount}")
-        elif '상각후원가측정' in account_name and '자산' in account_name:
-            assets_items['amortized_cost_assets'] = amount
-            print(f"자산 구성 추가: 상각후원가측정자산 = {amount}")
-            
+        elif is_financial_institution:
+            # 금융기관의 경우 금융기관 특화 항목들만 표시
+            if '공정가치측정금융자산' in account_name:
+                assets_items['fair_value_assets'] = amount
+                print(f"자산 구성 추가: 공정가치측정금융자산 = {amount}")
+            elif '보험계약자산' in account_name:
+                assets_items['insurance_assets'] = amount
+                print(f"자산 구성 추가: 보험계약자산 = {amount}")
+            elif '파생상품자산' in account_name:
+                assets_items['derivative_assets'] = amount
+                print(f"자산 구성 추가: 파생상품자산 = {amount}")
+            elif '상각후원가측정' in account_name and '자산' in account_name:
+                assets_items['amortized_cost_assets'] = amount
+                print(f"자산 구성 추가: 상각후원가측정자산 = {amount}")
+        else:
+            # 일반 기업의 경우 일반적인 자산 항목들만 표시
+            if '유동자산' in account_name and '비유동자산' not in account_name:
+                # 유동자산은 가장 큰 값을 사용 (최신 데이터)
+                if 'current_assets' not in assets_items or amount > assets_items['current_assets']:
+                    assets_items['current_assets'] = amount
+            elif '비유동자산' in account_name:
+                # 비유동자산은 가장 큰 값을 사용 (최신 데이터)
+                if 'non_current_assets' not in assets_items or amount > assets_items['non_current_assets']:
+                    assets_items['non_current_assets'] = amount
+            elif '재고자산' in account_name:
+                assets_items['inventory'] = amount
+            elif '매출채권' in account_name or '수취채권' in account_name:
+                assets_items['receivables'] = amount
+            elif '현금' in account_name or '예치금' in account_name:
+                assets_items['cash'] = amount
+            elif '대출채권' in account_name or '대출' in account_name:
+                assets_items['loans'] = amount
+        
         # 부채 항목들
         elif '부채총계' in account_name:
             balance_structure['balance_equation']['total_liabilities'] = amount
-        elif '유동부채' in account_name and '비유동부채' not in account_name:
-            # 유동부채는 가장 큰 값을 사용 (최신 데이터)
-            if 'current_liabilities' not in liabilities_items or amount > liabilities_items['current_liabilities']:
-                liabilities_items['current_liabilities'] = amount
-        elif '비유동부채' in account_name:
-            # 비유동부채는 가장 큰 값을 사용 (최신 데이터)
-            if 'non_current_liabilities' not in liabilities_items or amount > liabilities_items['non_current_liabilities']:
-                liabilities_items['non_current_liabilities'] = amount
-        elif '매입채무' in account_name:
-            liabilities_items['payables'] = amount
-        elif '차입금' in account_name or '대출' in account_name:
-            liabilities_items['borrowings'] = amount
-        elif '예수금' in account_name or '예치금' in account_name:
-            liabilities_items['deposits'] = amount
-        # 금융기관 특화 부채 항목들
-        elif '예수부채' in account_name:
-            liabilities_items['deposit_liabilities'] = amount
-            print(f"부채 구성 추가: 예수부채 = {amount}")
-        elif '보험계약부채' in account_name:
-            liabilities_items['insurance_liabilities'] = amount
-            print(f"부채 구성 추가: 보험계약부채 = {amount}")
-        elif '파생상품부채' in account_name:
-            liabilities_items['derivative_liabilities'] = amount
-            print(f"부채 구성 추가: 파생상품부채 = {amount}")
-            
+        elif is_financial_institution:
+            # 금융기관의 경우 금융기관 특화 항목들만 표시
+            if '예수부채' in account_name:
+                liabilities_items['deposit_liabilities'] = amount
+                print(f"부채 구성 추가: 예수부채 = {amount}")
+            elif '보험계약부채' in account_name:
+                liabilities_items['insurance_liabilities'] = amount
+                print(f"부채 구성 추가: 보험계약부채 = {amount}")
+            elif '파생상품부채' in account_name:
+                liabilities_items['derivative_liabilities'] = amount
+                print(f"부채 구성 추가: 파생상품부채 = {amount}")
+        else:
+            # 일반 기업의 경우 일반적인 부채 항목들만 표시
+            if '유동부채' in account_name and '비유동부채' not in account_name:
+                # 유동부채는 가장 큰 값을 사용 (최신 데이터)
+                if 'current_liabilities' not in liabilities_items or amount > liabilities_items['current_liabilities']:
+                    liabilities_items['current_liabilities'] = amount
+            elif '비유동부채' in account_name:
+                # 비유동부채는 가장 큰 값을 사용 (최신 데이터)
+                if 'non_current_liabilities' not in liabilities_items or amount > liabilities_items['non_current_liabilities']:
+                    liabilities_items['non_current_liabilities'] = amount
+            elif '매입채무' in account_name:
+                liabilities_items['payables'] = amount
+            elif '차입금' in account_name or '대출' in account_name:
+                liabilities_items['borrowings'] = amount
+            elif '예수금' in account_name or '예치금' in account_name:
+                liabilities_items['deposits'] = amount
+        
         # 자본 항목들
         elif '자본총계' in account_name:
             balance_structure['balance_equation']['total_equity'] = amount
