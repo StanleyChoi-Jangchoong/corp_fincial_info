@@ -3429,13 +3429,13 @@
                 }
                 
                 // ROE (자기자본수익률)
-                if (currentAnalysisData && currentAnalysisData.financial_ratios && currentAnalysisData.financial_ratios.roe !== undefined) {
-                    const roeClass = currentAnalysisData.financial_ratios.roe > 15 ? 'positive' : 
-                                    currentAnalysisData.financial_ratios.roe > 8 ? 'neutral' : 'negative';
+                if (currentAnalysisData && currentAnalysisData.profitability_analysis && currentAnalysisData.profitability_analysis.roe !== undefined) {
+                    const roeClass = currentAnalysisData.profitability_analysis.roe > 15 ? 'positive' : 
+                                    currentAnalysisData.profitability_analysis.roe > 8 ? 'neutral' : 'negative';
                     html += `
                         <div class="metric-row">
                             <span class="metric-label">자기자본수익률 (ROE)</span>
-                            <span class="metric-value ${roeClass}">${currentAnalysisData.financial_ratios.roe}%</span>
+                            <span class="metric-value ${roeClass}">${currentAnalysisData.profitability_analysis.roe}%</span>
                         </div>
                     `;
                 } else {
@@ -3448,13 +3448,13 @@
                 }
                 
                 // ROA (총자산수익률)
-                if (currentAnalysisData && currentAnalysisData.financial_ratios && currentAnalysisData.financial_ratios.roa !== undefined) {
-                    const roaClass = currentAnalysisData.financial_ratios.roa > 8 ? 'positive' : 
-                                    currentAnalysisData.financial_ratios.roa > 4 ? 'neutral' : 'negative';
+                if (currentAnalysisData && currentAnalysisData.profitability_analysis && currentAnalysisData.profitability_analysis.roa !== undefined) {
+                    const roaClass = currentAnalysisData.profitability_analysis.roa > 8 ? 'positive' : 
+                                    currentAnalysisData.profitability_analysis.roa > 4 ? 'neutral' : 'negative';
                     html += `
                         <div class="metric-row">
                             <span class="metric-label">총자산수익률 (ROA)</span>
-                            <span class="metric-value ${roaClass}">${currentAnalysisData.financial_ratios.roa}%</span>
+                            <span class="metric-value ${roaClass}">${currentAnalysisData.profitability_analysis.roa}%</span>
                         </div>
                     `;
                 } else {
