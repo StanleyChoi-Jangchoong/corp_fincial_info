@@ -1461,6 +1461,10 @@ def get_detailed_financial_analysis(corp_code):
                     print(f"{i+1}. [{sj_div}] {account_name}: {amount}")
             else:
                 print("=== 동국제강 complete_data가 비어있음 ===")
+                
+            # 동국제강의 경우 API 응답 상태 출력
+            print(f"=== 동국제강 API 응답 상태 ===")
+            print(f"API 응답이 성공적으로 받아졌는지 확인")
         
         # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
