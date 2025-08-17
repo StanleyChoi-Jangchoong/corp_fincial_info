@@ -1431,6 +1431,10 @@ def get_detailed_financial_analysis(corp_code):
                 if any(keyword in account_name for keyword in ['이자비용', '이자비용(수익)', '이자비용(손실)', '이자비용(수익)', '이자의 지급', '이자지급', '금융원가', '금융비용', '금융비용(손실)']):
                     financial_metrics['interest_expense'] = amount
                     print(f"현금흐름표에서 이자비용 발견: {account_name} = {amount}")
+                
+                # 동국제강의 경우 현금흐름표 모든 계정 출력
+                if corp_code == '01765265':
+                    print(f"현금흐름표 계정: {account_name} = {amount}")
         
         # EBITDA 계산 (기존 분석 데이터에서 영업이익 가져오기)
         ebitda = None
